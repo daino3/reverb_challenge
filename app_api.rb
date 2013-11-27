@@ -1,9 +1,11 @@
 require 'grape'
 require 'json'
-require_relative 'driver.rb'
+require_relative 'models/list_of_people.rb'
+require_relative 'models/file_parser.rb'
 
-# run 'rackup' from terminal - default port is 9292. Can set port with 'rackup -p <port_num>'
-module Test
+$people = ListofPeople.new(FileParser::TEXT_FILE[:csv],FileParser::TEXT_FILE[:psv], FileParser::TEXT_FILE[:ssv])
+
+module PersonParser
   class AppAPI < Grape::API
 
     version 'v1', using: :header, vendor: 'dain'
@@ -14,57 +16,30 @@ module Test
   			"Hello"
   		end
 
-    resources :records do
+    resources :people do
 
-    	desc 'list all records'
+    	desc 'list all people'
 	  		get '/all' do
-	  			records = Records.get_data
-	  			counter = 1
-	  			object = {}
-	  			records.each do |person|
-	  				object[counter] = map_person_to_variable_names(person)
-	  				counter += 1
-	  			end
-					return object
+          sorted_people = $people.order_by("last_name")
+	  			PeoplePrinter.map_people_to_attributes_in_hash(sorted_people)
   			end
 
-			desc 'list records sorted by gender & last name'
+			desc 'list people sorted by gender & last name'
 	  		get '/gender' do
-	  			records = Records.get_data
-	  			counter = 1
-	  			object = {}
-	  			sorted_records = records.sort_by { |person| [person.gender, person.last_name] }
-	  			sorted_records.each do |person|
-	  				object[counter] = map_person_to_variable_names(person)
-	  				counter += 1
-	  			end
-					return object
+	  			sorted_people = $people.order_by("gender", "last_name")
+	  			PeoplePrinter.map_people_to_attributes_in_hash(sorted_people)
   			end
 
-  		desc 'list records sorted by birthdate'
+  		desc 'list people sorted by birthdate'
 	  		get '/birthdate' do
-	  			records = Records.get_data
-	  			counter = 1
-	  			object = {}
-	  			sorted_records = records.sort_by { |person| person.date_of_birth }
-	  			sorted_records.each do |person|
-	  				object[counter] = map_person_to_variable_names(person)
-	  				counter += 1
-	  			end
-					return object
+	  			sorted_people = $people.order_by("date_of_birth", "last_name")
+	  			PeoplePrinter.map_people_to_attributes_in_hash(sorted_people)
   			end
 
-  		desc 'list records sorted by last name'
+  		desc 'list people sorted by last name in reverse order'
 	  		get '/name' do
-	  			records = Records.get_data
-	  			counter = 1
-	  			object = {}/
-	  			sorted_records = records.sort_by { |person| person.last_name }.reverse
-	  			sorted_records.each do |person|
-	  				object[counter] = map_person_to_variable_names(person)
-	  				counter += 1
-	  			end
-					return object
+	  			sorted_people = $people.order_by("last_name").reverse
+	  			PeoplePrinter.map_people_to_attributes_in_hash(sorted_people)
   			end
 
   			desc 'create a person'
@@ -76,13 +51,12 @@ module Test
   				requires :favorite_color, type: String, desc: "Favorite Color"
   			end
   			post do
-  				file = File.open('data_files/csv.txt') 
-  				person = Person.new({"FirstName" => params[:first_name],
-  														"LastName" => params[:last_name],
-  														"Gender" => params[:gender],
-  														"DateOfBirth" => params[:date_of_birth],
-  														"FavoriteColor" => params[:favorite_color]})
-  				FileParser.save_to_file(file, person)	
+  				person = Person.new({firstname: params[:first_name],
+              									lastname: params[:last_name],
+              									gender: params[:gender],
+              									dateofbirth: params[:date_of_birth],
+              									favoritecolor: params[:favorite_color]})
+  				FileParser.save_to_file(FileParser::TEXT_FILE[:csv], person)	
   			end
   	end
   end
