@@ -12,12 +12,12 @@ require_relative 'app_api.rb'
 describe Person do
 
   it 'has accessible attributes' do
-  	person = Person.new({firstname:'Dain', 
+    person = Person.new({firstname:'Dain', 
                          lastname: 'Hall',
                          gender: 'M',
                          dateofbirth: '2000-07-14', 
                          favoritecolor: 'Blue'})
-  	expect(person.first_name).to eq('Dain')
+    expect(person.first_name).to eq('Dain')
     expect(person.last_name).to eq('Hall')
     expect(person.gender).to eq('M')
     expect(person.date_of_birth).to eq('2000-07-14')
