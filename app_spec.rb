@@ -1,5 +1,4 @@
 require 'rspec'
-require 'pry'
 require 'simplecov'
 require 'rack/test'
 SimpleCov.start
@@ -32,8 +31,9 @@ describe ListofPeople do
     it 'initializes with file names and returns a ListofPeople object' do
       expect(people).to be_an(ListofPeople)
     end
+  end
 
-  describe '#order_by_by'
+  describe '#order_by_by' do
     it 'sorts ListofPeople object' do
       expect(people.order_by("favorite_color").first.favorite_color).to eq("Black")
       expect(people.order_by("favorite_color").last.favorite_color).to eq("Yellow")  
@@ -66,7 +66,9 @@ describe FileParser do
       expect(parsed_file.first.gender).to eq(('Male' || 'Female'))
     end
   end
+end
 
+describe PersonSaver do
   describe '#save_to_file' do
     let(:file) { File.open(FileParser::TEXT_FILE[:test]) }
     let(:person) { Person.new(firstname: "Test",
@@ -76,7 +78,7 @@ describe FileParser do
                               favoritecolor: "Blue") }
     
     it 'saves to the test file in csv format' do
-      FileParser.save_to_file(file, person)
+      PersonSaver.save_to_file(file, person)
       file.read.should include(("McTester" && "Test" && "Male" && "Blue" && "07/14/2011"))
     end
   end
@@ -90,11 +92,6 @@ describe PersonParser::AppAPI do
   end
 
   describe PersonParser::AppAPI do
-    let(:person) { Person.new(firstname: "Test",
-                              lastname: "McTester",
-                              gender: "Female",
-                              dateofbirth: Date.parse("2011-07-14"),
-                              favoritecolor: "Blue") }
     
     describe "GET /people/all" do
       it "returns rendered records" do
@@ -139,5 +136,3 @@ describe PersonParser::AppAPI do
     end
   end
 end
-
-

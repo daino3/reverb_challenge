@@ -1,24 +1,26 @@
+class PeoplePrinter
 
-module PeoplePrinter
-
-  def self.map_people_to_attributes(list_of_people)
-    list_of_people.map do |person|
-      person.properties
-    end
+  def initialize(list_of_people)
+    @list_of_people = list_of_people
   end
 
-  def self.map_people_to_attributes_in_hash(list_of_people)
+  def convert_to_hash
     container = {}
-    list_of_people.each_with_index do |person, index|
+    @list_of_people.each_with_index do |person, index|
       container[index+1] = person.properties
     end
     container
   end
 
-  def self.print_people(list_of_people)
-    list_of_people.each do |person_array|
+  def print_people
+    convert_to_array.each do |person_array|
       puts person_array.join(', ')
     end
   end
 
+  private
+
+  def convert_to_array
+    @list_of_people.map(&:properties)
+  end
 end

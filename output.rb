@@ -5,15 +5,17 @@ require_relative 'models/file_parser.rb'
 
 people = ListofPeople.new(FileParser::TEXT_FILE[:csv],FileParser::TEXT_FILE[:psv], FileParser::TEXT_FILE[:ssv])
 
+def sort_and_print(people, *properties)
+  sorted_people = people.order_by(*properties)
+  PeoplePrinter.new(sorted_people).print_people
+end
+
 puts '----------------'
 puts "Output 1:"
-sorted_people = people.order_by("gender", "last_name")
-PeoplePrinter.print_people(PeoplePrinter.map_people_to_attributes(sorted_people))
+sort_and_print(people,"gender", "last_name")
 puts '----------------'
 puts "Output 2:"
-sorted_people = people.order_by("date_of_birth", "last_name")
-PeoplePrinter.print_people(PeoplePrinter.map_people_to_attributes(sorted_people))
+sort_and_print(people,"date_of_birth", "last_name")
 puts '----------------'
 puts "Output 3:"
-sorted_people = people.order_by("last_name").reverse
-PeoplePrinter.print_people(PeoplePrinter.map_people_to_attributes(sorted_people))
+sort_and_print(people,"last_name").reverse
